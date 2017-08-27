@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>放大镜</title>
+    <style>
+        #small{
+            width: 400px;
+            height: 400px;
+            float: left;
+            position: relative;
+        }
+        #big{
+            width: 400px;
+            height: 400px;
+            float: left;
+            overflow: hidden;
+            display: none;
+            position: relative;
+        }
+        #big-pic{
+            position: absolute;
+        }
+        #drag{
+            width: 200px;
+            height: 200px;
+            background: #ccc;
+            opacity: 0.6;
+            filter: alpha(opacity = 60);
+            position: absolute;
+            left: 0;
+            top: 0;
+            display: none;
+        }
+        #mask{
+            width: 400px;
+            height: 400px;
+            background: #f00;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            filter: alpha(opacity=0);
+        }
+    </style>
+</head>
+<body>
+    <div id="small">
+        <div id="drag"></div>
+        <img src="img/1.jpg">
+        <div id="mask"></div>           <!--解决事件冒泡、IE6不兼容问题-->
+    </div>
+    <div id="big">
+        <img src="img/2.jpg" id="big-pic">
+    </div>
+    <script>
+        (function(){
+            var oSmall = getById("small");
+            var oDrag = getById("drag");
+            var oBig = getById("big");
+            var oBigPic = getById("big-pic");
+            var oMask = getById("mask");
+            oMask.onmouseover = function(){
+                oDrag.style.display = "block";
+                oBig.style.display = "block";
+            };
+            oMask.onmouseout = function() {
+                oDrag.style.display = "none";
+                oBig.style.display = "none";
+            }
+            oSmall.onmousemove = function(e){
+                e = e || window.event;
+                var left = e.clientX - oDrag.offsetWidth / 2;
+                var top =  e.clientY - oDrag.offsetHeight / 2;
+                if(left < 0){
+                    left = 0;
+                }
+                var xMax = oSmall.offsetWidth - oDrag.offsetWidth;
+                var yMax = oSmall.offsetHeight - oDrag.offsetHeight;
+                if(left > xMax){
+                    left = xMax;
+                }
+                if(top < 0){
+                    top = 0;
+                }
+                if(top > yMax){
+                    top = yMax;
+                }
+
+                //设置右边的放大图片
+                oDrag.style.left = left + "px";
+                oDrag.style.top = top + "px";
+                var fScaleX = left / xMax;
+                var fScaleY = top /yMax;
+                oBigPic.style.left = - fScaleX * (oBigPic.offsetWidth - oBig.offsetWidth) + "px";
+                oBigPic.style.top = - fScaleY * (oBigPic.offsetHeight - oBig.offsetHeight) + "px";
+            };
+            function getById(id){
+                return document.getElementById(id);
+            }
+        })();
+    </script>
+</body>
+</html>
